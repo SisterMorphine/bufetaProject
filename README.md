@@ -1,2 +1,3 @@
-# bufetaProject
-Flutter testing project
+# catproject
+
+A new Flutter project.
