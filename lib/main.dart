@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'model/cat.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -40,8 +42,6 @@ class _CatScreenState extends State<CatScreen> {
   }
 
   Future<void> _fetchNewCat() async {
-    if (!mounted) return;
-
     setState(() {
       _isLoading = true;
     });
@@ -50,30 +50,25 @@ class _CatScreenState extends State<CatScreen> {
       final response = await http
           .get(Uri.parse('https://api.thecatapi.com/v1/images/search'));
 
-      if (!mounted) return;
-
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final imageUrl = data[0]['url'];
+        //final cat = json.decode(response.body);
+
+        Cat cat = Cat.fromJson(json.decode(response.body)[0]);
         setState(() {
-          _catImageUrl = imageUrl;
+          _catImageUrl = cat.imageUrl;
         });
       } else {
         throw Exception('Failed to load cat');
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error fetching cat 😿: $e')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching cat 😿: $e')),
+      );
     }
 
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
