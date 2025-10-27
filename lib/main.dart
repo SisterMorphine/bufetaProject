@@ -32,43 +32,30 @@ class CatScreen extends StatefulWidget {
 }
 
 class _CatScreenState extends State<CatScreen> {
-  String? _catImageUrl;
-  bool _isLoading = false;
+  late Future<Cat> futureCat;
 
   @override
   void initState() {
     super.initState();
-    _fetchNewCat();
+    futureCat = fetchNewCat();
   }
 
-  Future<void> _fetchNewCat() async {
-    setState(() {
-      _isLoading = true;
-    });
-
+  Future<Cat> fetchNewCat() async {
     try {
       final response = await http
           .get(Uri.parse('https://api.thecatapi.com/v1/images/search'));
 
       if (response.statusCode == 200) {
-        //final cat = json.decode(response.body);
-
         Cat cat = Cat.fromJson(json.decode(response.body)[0]);
-        setState(() {
-          _catImageUrl = cat.imageUrl;
-        });
+
+        return cat;
       } else {
         throw Exception('Failed to load cat');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching cat 😿: $e')),
-      );
+      print('Error fetching cat 😿: $e');
+      return Cat(catId: 'error', imageUrl: null);
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
@@ -82,28 +69,45 @@ class _CatScreenState extends State<CatScreen> {
         children: [
           Expanded(
             child: Center(
-              child: _isLoading
-                  ? const CircularProgressIndicator()
-                  : _catImageUrl != null
-                      ? Image.network(
-                          _catImageUrl!,
-                          fit: BoxFit.contain,
-                          width: double.infinity,
-                          height: double.infinity,
-                          loadingBuilder: (context, child, progress) {
-                            if (progress == null) return child;
-                            return const CircularProgressIndicator();
-                          },
-                        )
-                      : const Text('No cat loaded yet 🐾'),
-            ),
+                child: FutureBuilder<Cat>(
+              future: futureCat,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return const Text('Error loading cat 😿');
+                } else if (snapshot.hasData) {
+                  final cat = snapshot.data!;
+                  if (cat.imageUrl != null) {
+                    return Image.network(
+                      cat.imageUrl!,
+                      fit: BoxFit.contain,
+                      width: double.infinity,
+                      height: double.infinity,
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return const CircularProgressIndicator();
+                      },
+                    );
+                  } else {
+                    return const Text('No cat loaded yet 🐾');
+                  }
+                } else {
+                  return const Text('No cat loaded yet 🐾');
+                }
+              },
+            )),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: _isLoading ? null : _fetchNewCat,
+                onPressed: () {
+                  setState(() {
+                    futureCat = fetchNewCat();
+                  });
+                },
                 icon: const Icon(Icons.refresh),
                 label: const Text(
                   'Load New Cat 😺',
