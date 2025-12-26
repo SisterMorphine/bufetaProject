@@ -1,8 +1,7 @@
+import 'package:catproject/repository/cats_repository.dart';
+import 'package:catproject/repository/service/cats_service.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-import 'model/cat.dart';
+import 'repository/models/cat.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,29 +32,13 @@ class CatScreen extends StatefulWidget {
 
 class _CatScreenState extends State<CatScreen> {
   late Future<Cat> futureCat;
+  late final CatsRepository catsRepository;
 
   @override
   void initState() {
     super.initState();
-    futureCat = fetchNewCat();
-  }
-
-  Future<Cat> fetchNewCat() async {
-    try {
-      final response = await http
-          .get(Uri.parse('https://api.thecatapi.com/v1/images/search'));
-
-      if (response.statusCode == 200) {
-        Cat cat = Cat.fromJson(json.decode(response.body)[0]);
-
-        return cat;
-      } else {
-        throw Exception('Failed to load cat');
-      }
-    } catch (e) {
-      print('Error fetching cat 😿: $e');
-      return Cat(catId: 'error', imageUrl: null);
-    }
+    catsRepository = CatsRepository(CatsService());
+    futureCat = catsRepository.fetchNewCat();
   }
 
   @override
@@ -105,7 +88,7 @@ class _CatScreenState extends State<CatScreen> {
               child: ElevatedButton.icon(
                 onPressed: () {
                   setState(() {
-                    futureCat = fetchNewCat();
+                    futureCat = catsRepository.fetchNewCat();
                   });
                 },
                 icon: const Icon(Icons.refresh),
