@@ -1,0 +1,34 @@
+import 'package:catproject/repository/models/cat.dart';
+import 'package:equatable/equatable.dart';
+
+enum RandomCatStatus { initial, loading, success, failure }
+
+extension RandomCatStatusX on RandomCatStatus {
+  bool get isInitial => this == RandomCatStatus.initial;
+  bool get isLoading => this == RandomCatStatus.loading;
+  bool get isSuccess => this == RandomCatStatus.success;
+  bool get isFailure => this == RandomCatStatus.failure;
+}
+
+class RandomCatState extends Equatable {
+  const RandomCatState({
+    this.status = RandomCatStatus.initial,
+    Cat? cat,
+  }) : cat = cat ?? Cat.empty;
+
+  final Cat cat;
+  final RandomCatStatus status;
+
+  @override
+  List<Object?> get props => [cat, status];
+
+  RandomCatState copyWith({
+    Cat? cat,
+    RandomCatStatus? status,
+  }) {
+    return RandomCatState(
+      cat: cat ?? this.cat,
+      status: status ?? this.status,
+    );
+  }
+}

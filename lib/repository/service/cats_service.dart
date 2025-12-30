@@ -5,12 +5,11 @@ import 'dart:convert';
 class CatsService {
   final String baseUrl;
 
-  CatsService({this.baseUrl = 'https://api.rawg.io/api'});
+  CatsService({this.baseUrl = 'https://api.thecatapi.com/v1'});
 
   Future<Cat> fetchNewCat() async {
     try {
-      final response = await http
-          .get(Uri.parse('https://api.thecatapi.com/v1/images/search'));
+      final response = await http.get(Uri.parse('$baseUrl/images/search'));
 
       if (response.statusCode == 200) {
         Cat cat = Cat.fromJson(json.decode(response.body)[0]);

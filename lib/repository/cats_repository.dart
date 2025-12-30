@@ -2,7 +2,7 @@ import 'package:catproject/repository/service/cats_service.dart';
 import 'package:catproject/repository/models/cat.dart';
 
 class CatsRepository {
-  const CatsRepository(this.service);
+  const CatsRepository({required this.service});
 
   final CatsService service;
 

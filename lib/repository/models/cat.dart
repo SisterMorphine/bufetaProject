@@ -1,4 +1,6 @@
-class Cat {
+import 'package:equatable/equatable.dart';
+
+class Cat extends Equatable {
   final String catId;
   final String? imageUrl;
 
@@ -10,4 +12,9 @@ class Cat {
       imageUrl: json['url'],
     );
   }
+
+  @override
+  List<Object?> get props => [catId, imageUrl];
+
+  static const empty = Cat(catId: '', imageUrl: null);
 }
