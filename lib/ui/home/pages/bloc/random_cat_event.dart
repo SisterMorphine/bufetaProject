@@ -1,6 +1,11 @@
 import 'package:equatable/equatable.dart';
 
-class RandomCatEvent extends Equatable {
+class CatEvent extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
+
+class RandomCatEvent extends CatEvent {
   @override
   List<Object?> get props => [];
 }
