@@ -4,6 +4,8 @@ Bufeta is a Flutter app built for **testing and learning** purposes — a playgr
 
 Currently, the app displays random cat images fetched from the public [TheCatAPI](https://api.thecatapi.com/), with a simple button to load new images. Over time, Bufeta will evolve as new testing strategies, UI components, and Flutter features are explored.
 
+We are using Bloc library for App state management https://bloclibrary.dev/
+
 ---
 
 ## 📱 Preview
