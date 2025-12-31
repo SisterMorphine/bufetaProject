@@ -10,10 +10,7 @@ We are using Bloc library for App state management https://bloclibrary.dev/
 
 ## 📱 Preview
 
-> *(Add your screenshot here when available)*  
-> Example:  
-> ![Bufeta Screenshot](screenshots/home.png)
-
+> [![Screenshot-1767174954.png](https://i.postimg.cc/C11x2JBs/Screenshot-1767174954.png)](https://postimg.cc/sBkzQYJM)
 ---
 
 ## 🚀 Getting Started
