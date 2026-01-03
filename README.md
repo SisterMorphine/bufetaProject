@@ -28,3 +28,75 @@ git clone https://github.com/YOUR_USERNAME/bufeta.git
 cd bufeta
 flutter pub get
 flutter run
+```
+
+
+### Using an API key
+
+We recommend keeping API keys out of source control and passing them at build/run time using `--dart-define-from-file`.
+
+1. Create a JSON file at `./.secrets/thecatapi.json` (this repo already ignores `.secrets/`):
+
+```json
+{
+  "THECATAPI_KEY": "your_key_here"
+}
+```
+
+2. Run or build with the file:
+
+```bash
+flutter run --dart-define-from-file=.secrets/thecatapi.json
+flutter build apk --dart-define-from-file=.secrets/thecatapi.json
+```
+
+`CatsService` reads `THECATAPI_KEY` via `String.fromEnvironment` and will include it as the `x-api-key` header when present. For production, consider a server-side proxy or key restrictions.
+
+### Testing / Mocking Strategy
+- Repo and HTTP client are injected into blocs — replace them with fakes/mocks in tests.
+- Use package:mocktail or package:mockito to stub network responses.
+- To run tests with a local mock server, set a dart-define or configure the API base URL in lib/data/.
+
+### Architecture / Project Layout
+- lib/
+  - main.dart — app entry
+  - ui/ — presentation layer: screens, pages, widgets
+    - home/ — home page layout, widgets and blocs
+  - repository/ — data layer: repositories, services, models
+  - main.dart — app entry
+
+
+**Architecture (Layers)**
+- **Presentation (`lib/ui/`)**: Widgets, pages and layout components. UI widgets should be dumb and receive data/state from BLoCs. See the home page layout and widgets in [lib/ui/home/](lib/ui/home/).
+- **Business Logic (BLoC)**: BLoCs live near the UI they serve. Example: `RandomCatBloc` coordinates events -> states and lives at [lib/ui/home/pages/bloc/random_cat_bloc.dart](lib/ui/home/pages/bloc/random_cat_bloc.dart).
+- **Repository / Service (Data Layer)**: Handle API calls and data transformation. `CatsRepository` delegates to `CatsService` (see [lib/repository/cats_repository.dart](lib/repository/cats_repository.dart) and [lib/repository/service/cats_service.dart](lib/repository/service/cats_service.dart)).
+- **Models**: Domain/data objects are in [lib/repository/models/](lib/repository/models/).
+
+
+**BLoC Pattern & Example Flow**
+- Events: user or lifecycle actions that describe "what happened". Example: `RandomCatEvent` ([lib/ui/home/pages/bloc/random_cat_event.dart](lib/ui/home/pages/bloc/random_cat_event.dart)).
+- States: immutable snapshots of UI state. Example: `RandomCatState` ([lib/ui/home/pages/bloc/random_cat_state.dart](lib/ui/home/pages/bloc/random_cat_state.dart)).
+- Bloc: receives events, runs logic (calls repository/service), and emits new states. See `RandomCatBloc` ([lib/ui/home/pages/bloc/random_cat_bloc.dart](lib/ui/home/pages/bloc/random_cat_bloc.dart)).
+
+Example flow (simplified):
+1. UI dispatches `RandomCatEvent`.
+2. `RandomCatBloc` handles the event, emits a loading state, calls `CatsRepository.fetchNewCat()` and then emits success or failure state.
+3. UI listens via `BlocBuilder` and updates accordingly (see [lib/ui/home/pages/random_cat_layout.dart](lib/ui/home/pages/random_cat_layout.dart)).
+
+**Dependency Injection & Providers**
+- Use `RepositoryProvider` and `BlocProvider` to inject dependencies into the widget tree. Example (see [lib/ui/home/pages/random_cat_page.dart](lib/ui/home/pages/random_cat_page.dart)):
+
+```dart
+RepositoryProvider(
+  create: (context) => CatsRepository(service: CatsService()),
+  child: BlocProvider(
+    create: (context) => RandomCatBloc(catRepository: context.read<CatsRepository>())..add(RandomCatEvent()),
+    child: const RandomCatLayout(),
+  ),
+)
+```
+
+**Observability**
+- A global `BlocObserver` is implemented at [lib/ui/utils/bloc_observer.dart](lib/ui/utils/bloc_observer.dart) to help trace transitions and cubit changes during development.
+
+

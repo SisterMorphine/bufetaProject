@@ -4,12 +4,19 @@ import 'dart:convert';
 
 class CatsService {
   final String baseUrl;
+  final String apiKey;
 
-  CatsService({this.baseUrl = 'https://api.thecatapi.com/v1'});
+  CatsService({this.baseUrl = 'https://api.thecatapi.com/v1', String? apiKey})
+      : apiKey = apiKey ??
+            const String.fromEnvironment('THECATAPI_KEY', defaultValue: '');
 
   Future<Cat> fetchNewCat() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/images/search'));
+      final headers = apiKey.isNotEmpty ? {'x-api-key': apiKey} : null;
+      final response = await http.get(
+        Uri.parse('$baseUrl/images/search'),
+        headers: headers,
+      );
 
       if (response.statusCode == 200) {
         Cat cat = Cat.fromJson(json.decode(response.body)[0]);
