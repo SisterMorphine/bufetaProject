@@ -1,5 +1,5 @@
 name: catproject
-description: "A new Flutter project."
+description: "App to learn about fluter, bloc pattern and testing"
 publish_to: 'none'
 version: 0.1.0
 
@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   http: ^1.2.0
+  mocktail: ^1.0.4
 
 
 dev_dependencies:

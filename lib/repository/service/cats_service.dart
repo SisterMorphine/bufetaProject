@@ -2,13 +2,19 @@ import "package:catproject/repository/models/cat.dart";
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:http/http.dart';
+
 class CatsService {
   final String baseUrl;
   final String apiKey;
+  final http.Client httpClient;
 
-  CatsService({this.baseUrl = 'https://api.thecatapi.com/v1', String? apiKey})
-      : apiKey = apiKey ??
-            const String.fromEnvironment('THECATAPI_KEY', defaultValue: '');
+  CatsService({
+    http.Client? httpClient,
+    this.baseUrl = 'https://api.thecatapi.com/v1',
+    String? apiKey,
+  })  : httpClient = httpClient ?? http.Client(),
+        apiKey = apiKey ?? const String.fromEnvironment('THECATAPI_KEY');
 
   Future<Cat> fetchNewCat() async {
     try {
@@ -19,11 +25,14 @@ class CatsService {
       );
 
       if (response.statusCode == 200) {
-        Cat cat = Cat.fromJson(json.decode(response.body)[0]);
-
-        return cat;
+        if (response.body.isNotEmpty) {
+          Cat cat = Cat.fromJson(json.decode(response.body)[0]);
+          return cat;
+        } else {
+          throw ErrorEmptyResponse();
+        }
       } else {
-        throw Exception('Failed to load cat');
+        throw ErrorSearchingCat();
       }
     } catch (e) {
       print('Error fetching cat 😿: $e');
@@ -31,3 +40,7 @@ class CatsService {
     }
   }
 }
+
+class ErrorSearchingCat implements Exception {}
+
+class ErrorEmptyResponse implements Exception {}
