@@ -72,17 +72,6 @@ flutter build apk --dart-define-from-file=.secrets/thecatapi.json
 - **Repository / Service (Data Layer)**: Handle API calls and data transformation. `CatsRepository` delegates to `CatsService` (see [lib/repository/cats_repository.dart](lib/repository/cats_repository.dart) and [lib/repository/service/cats_service.dart](lib/repository/service/cats_service.dart)).
 - **Models**: Domain/data objects are in [lib/repository/models/](lib/repository/models/).
 
-
-**BLoC Pattern & Example Flow**
-- Events: user or lifecycle actions that describe "what happened". Example: `RandomCatEvent` ([lib/ui/home/pages/bloc/random_cat_event.dart](lib/ui/home/pages/bloc/random_cat_event.dart)).
-- States: immutable snapshots of UI state. Example: `RandomCatState` ([lib/ui/home/pages/bloc/random_cat_state.dart](lib/ui/home/pages/bloc/random_cat_state.dart)).
-- Bloc: receives events, runs logic (calls repository/service), and emits new states. See `RandomCatBloc` ([lib/ui/home/pages/bloc/random_cat_bloc.dart](lib/ui/home/pages/bloc/random_cat_bloc.dart)).
-
-Example flow (simplified):
-1. UI dispatches `RandomCatEvent`.
-2. `RandomCatBloc` handles the event, emits a loading state, calls `CatsRepository.fetchNewCat()` and then emits success or failure state.
-3. UI listens via `BlocBuilder` and updates accordingly (see [lib/ui/home/pages/random_cat_layout.dart](lib/ui/home/pages/random_cat_layout.dart)).
-
 **Dependency Injection & Providers**
 - Use `RepositoryProvider` and `BlocProvider` to inject dependencies into the widget tree. Example (see [lib/ui/home/pages/random_cat_page.dart](lib/ui/home/pages/random_cat_page.dart)):
 
