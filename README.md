@@ -10,7 +10,8 @@ We are using Bloc library for App state management https://bloclibrary.dev/
 
 ## 📱 Preview
 
-> [![Screenshot-1767174954.png](https://i.postimg.cc/C11x2JBs/Screenshot-1767174954.png)](https://postimg.cc/sBkzQYJM)
+> <img alt="Fattycat" src="https://i.postimg.cc/C11x2JBs/Screenshot-1767174954.png" width="200" align="center">
+
 ---
 
 ## 🚀 Getting Started
