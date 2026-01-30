@@ -55,7 +55,7 @@ flutter build apk --dart-define-from-file=.secrets/thecatapi.json
 
 ### Testing / Mocking Strategy
 - Repo and HTTP client are injected into blocs — replace them with fakes/mocks in tests.
-- Use package:mocktail or package:mockito to stub network responses.
+- We are using package:mocktail to stub network responses.
 - To run tests with a local mock server, set a dart-define or configure the API base URL in lib/data/.
 
 ### Architecture / Project Layout
@@ -72,19 +72,6 @@ flutter build apk --dart-define-from-file=.secrets/thecatapi.json
 - **Business Logic (BLoC)**: BLoCs live near the UI they serve. Example: `RandomCatBloc` coordinates events -> states and lives at [lib/ui/home/pages/bloc/random_cat_bloc.dart](lib/ui/home/pages/bloc/random_cat_bloc.dart).
 - **Repository / Service (Data Layer)**: Handle API calls and data transformation. `CatsRepository` delegates to `CatsService` (see [lib/repository/cats_repository.dart](lib/repository/cats_repository.dart) and [lib/repository/service/cats_service.dart](lib/repository/service/cats_service.dart)).
 - **Models**: Domain/data objects are in [lib/repository/models/](lib/repository/models/).
-
-**Dependency Injection & Providers**
-- Use `RepositoryProvider` and `BlocProvider` to inject dependencies into the widget tree. Example (see [lib/ui/home/pages/random_cat_page.dart](lib/ui/home/pages/random_cat_page.dart)):
-
-```dart
-RepositoryProvider(
-  create: (context) => CatsRepository(service: CatsService()),
-  child: BlocProvider(
-    create: (context) => RandomCatBloc(catRepository: context.read<CatsRepository>())..add(RandomCatEvent()),
-    child: const RandomCatLayout(),
-  ),
-)
-```
 
 **Observability**
 - A global `BlocObserver` is implemented at [lib/ui/utils/bloc_observer.dart](lib/ui/utils/bloc_observer.dart) to help trace transitions and cubit changes during development.
